@@ -8,6 +8,9 @@ from numpy.core.fromnumeric import product
 
 class Innovation():
     def __init__(self, initial) -> None:
+        '''
+        Just handels handing out innovation nubers so it is gloabally shared in the population
+        '''
         self.number = initial
 
     def getValue(self):
@@ -16,15 +19,7 @@ class Innovation():
 
 class Node():
     def __init__(self, layer, innovation_number, default_output, operation):
-        # inputs are given by innvoation numbers
         '''
-        To circular feed operations:
-        set first layer nodes outputs to values
-        set all nodes updated to true,
-        call collect inputs on all nodes
-        call stepOutputs
-        take the outputs of the final layers
-
         For feed forward:
         set all nodes updated to false
         set first notes output values, set their updated to true
@@ -51,6 +46,10 @@ class Node():
         return self.innovation_number
 
     def removeLostConnections(self, model):
+        '''
+        Remove connections that are dangeling
+        Used to point to a node which has since been removed
+        '''
         remove = []
         for connection in self.inputs.keys():
             if not self.inputs[connection] in model.keys():
@@ -165,6 +164,11 @@ class AgentFFO():
             self.model[node].removeLostConnections(self.model)
 
     def crossoverModels(self, secondModel):
+        '''
+        Crosses over or takes the union of two models.
+        Does not modify the referanced model.
+        If applied where the target model just initalized makes a copy of the referance model. 
+        '''
         myKeys = list(self.model.keys())
         theirKeys = (secondModel.model.keys())
 
@@ -213,17 +217,17 @@ if __name__ == '__main__':
 
     inno = Innovation(8+4)
     
-    for x in range(512):
+    for x in range(25):
         model.mutate(inno)
-        #model1.mutate(inno)
+        model1.mutate(inno)
 
     model.VisualizeModel()
 
-    #model1.VisualizeModel()
+    model1.VisualizeModel()
 
-    #model.crossoverModels(model1)
+    model.crossoverModels(model1)
 
-    #model.VisualizeModel()
+    model.VisualizeModel()
 
     start = time.time()
     result = model.forward([1,1,1,1,1,1,1,1])

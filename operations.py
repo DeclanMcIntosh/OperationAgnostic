@@ -1,5 +1,3 @@
-
-
 from numpy.core.fromnumeric import prod, product
 
 
@@ -21,7 +19,7 @@ def eightBitAdd(input):
 def eightBitMultiply(input):
     return product(input) % 256
 
-
+#### dispatcher for config files to be able to find functions
 operations_dispatcher = {   "NAND" : NAND,
                             "AND" : AND,
                             "OR" : OR,
