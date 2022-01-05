@@ -43,7 +43,7 @@ if __name__ == '__main__':
                     #env.render()
                     fitness += rew
             #print(fitness)
-            fitnesses[x] = fitness
+            fitnesses[x] = fitness/numberOfTrialsToRun
             #print(x)
 
         print('Done Evaluating All Agents for generation: ' + str(___))
@@ -129,8 +129,3 @@ if __name__ == '__main__':
     plt.show()
 
     agents[0].VisualizeModel()
-    # save the plot as a file
-    #fig.savefig('two_different_y_axis_for_single_python_plot_with_twinx.jpg',
-    #        format='jpeg',
-    #        dpi=100,
-    #        bbox_inches='tight')

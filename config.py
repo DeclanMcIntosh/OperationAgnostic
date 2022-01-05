@@ -13,13 +13,13 @@ outputs = 1
 agentParams=dict(inputs=inputs, outputs=outputs, max_layers=4, default_output=0, operations=[eightBitAdd], 
                 add_node_rate=0.25, add_connection_rate=0.5, remove_node_rate=0.1, remove_connection_rate=0.1)
 # Set parameters for training 
-population = 64
+population = 128
 generations = 128
 maxStepsPerRun = 100
 compatabilityThreashold = 0.5
 saveBestModelEachSpecies = True
 populationOverwriteRate = 0.125
-numberOfTrialsToRun = 1
+numberOfTrialsToRun = 10
 topXtoSave = 1
 
 inno = Innovation(inputs+outputs)
