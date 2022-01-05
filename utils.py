@@ -27,6 +27,6 @@ def CartPole_Action(obs, agent):
     else: action = 0
     return action
 
-
-dispatcher = {  "CartPole_Action": CartPole_Action,
+#### dispatcher for config files to be able to find functions
+dispatcher = {"CartPole_Action": CartPole_Action,
                 "convertSwingUpActionState": convertSwingUpActionState}
