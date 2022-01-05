@@ -42,6 +42,9 @@ if __name__ == '__main__':
                     obs, rew, terminal, info = env.step(action)
                     #env.render()
                     fitness += rew
+                terminal = False
+                _ =0
+                obs = env.reset()
             #print(fitness)
             fitnesses[x] = fitness/numberOfTrialsToRun
             #print(x)
