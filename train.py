@@ -9,7 +9,6 @@ import json
 
 from operations import *
 from utils import *
-from config import *
 
 def train(configString):
     with open(configString) as f:
@@ -80,7 +79,7 @@ def train(configString):
             for representative in representatives.keys():
                 correspondace = IoU(genome, representatives[representative])
                 #print(correspondace)
-                if correspondace > compatabilityThreashold:
+                if correspondace > config['compatabilityThreashold']:
                     match = representative
             if not match is None:
                 species[x] = match
@@ -93,7 +92,7 @@ def train(configString):
 
         speciesFitnesses = representatives.copy()
         for key in speciesFitnesses.keys(): speciesFitnesses[key] = 0
-        for x in range(population): speciesFitnesses[species[x]] += fitnesses[x]
+        for x in range(config['population']): speciesFitnesses[species[x]] += fitnesses[x]
         for key in speciesFitnesses.keys(): speciesFitnesses[key] = speciesFitnesses[key]/ species.count(key) 
 
         meanFtiness = np.mean(np.array((list(speciesFitnesses.values()))))
@@ -102,7 +101,7 @@ def train(configString):
         totalFitnesses = np.sum(np.array((list(speciesFitnesses.values()))))
         for key in adjustedSpeciesFitnesses.keys(): adjustedSpeciesFitnesses[key] = adjustedSpeciesFitnesses[key] / totalFitnesses
 
-        for x in range(int(population*populationOverwriteRate)):
+        for x in range(int(config['population']*config['populationOverwriteRate'])):
             # Pick species
             speciesToOverwrite = r.choice(list(adjustedSpeciesFitnesses.keys()))
             speciesToPropegate = r.choices(list(adjustedSpeciesFitnesses.keys()), weights=list(adjustedSpeciesFitnesses.values()))[0]
@@ -125,7 +124,7 @@ def train(configString):
         speciesRefs = list(adjustedSpeciesFitnesses.keys())
         for x in range(len(speciesRefs)):
             speciesIndexs = [i for i, k in enumerate(species) if k == speciesRefs[x]]
-            for index in speciesIndexs[topXtoSave:]:
+            for index in speciesIndexs[config['topXtoSave']:]:
                 agents[index].mutate(inno)
 
         fitnessHistory.append(meanFtiness)
