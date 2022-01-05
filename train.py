@@ -7,52 +7,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from operations import *
+from utils import *
+from config import *
 
-def f2int(float):
-    return int(float*128 + 128)
-
-def int2f(int):
-    return (int - 128)/128.
-
-def convertSwingUpActionState(obs):
-    output = []
-    for x in range(obs.shape[0]):
-        output.append(f2int(obs[x]))
-    return output
-
-def convertCartPoleActionState(obs):
-    output= [f2int(obs[0]/2.4),f2int(obs[1]/10),f2int(obs[2]/0.20943951),f2int(obs[3]/10)]
-    return output
-
-def IoU(a, b):
-    return len(list(set(a) & set(b)))/len(list(set(a) | set(b)))
-    
-if __name__ == '__main__':
-    # Set parameters for agents
-    agentParams=dict(inputs=4, outputs=1, max_layers=4, default_output=0, operations=[eightBitAdd, eightBitMultiply, max, min], 
-                    add_node_rate=0.25, add_connection_rate=0.5, remove_node_rate=0.1, remove_connection_rate=0.1)
-
-    # Set parameters for training 
-    population = 128
-    generations = 128
-    maxStepsPerRun = 100
-    compatabilityThreashold = 0.5
-    saveBestModelEachSpecies = True
-    populationOverwriteRate = 0.125
-    numberOfTrialsToRun = 1
-    topXtoSave = 1
-
-    # make our gobal innovation tracker
-    inno = Innovation(5+1)
-    
-    # Make environment Input in range [-1,1] ouput in range [-1,1]
-    #env=gym.make('CartPoleSwingUp-v0')
-    env=gym.make('CartPole-v0')
+if __name__ == '__main__':    
     env.reset()
-    
-    #action = env.action_space.sample()
-    #print(action)
-    #obs, rew, done, info = env.step(action)
 
     # intiallize agents and mutate all agents 
     agents = []
@@ -79,17 +38,13 @@ if __name__ == '__main__':
             for n in range(numberOfTrialsToRun):
                 while _ < maxStepsPerRun and not terminal:
                     _ +=1   
-                    uintObs = convertCartPoleActionState(obs)
-                    if agents[x].forward(uintObs)[0] > 128: action = 1
-                    else: action = 0
+                    action = action_handler(obs, agents[x])
                     obs, rew, terminal, info = env.step(action)
                     #env.render()
                     fitness += rew
             #print(fitness)
             fitnesses[x] = fitness
             #print(x)
-
-
 
         print('Done Evaluating All Agents for generation: ' + str(___))
         # speciate agents by sortting by fitness then deciding on species then 
@@ -179,5 +134,3 @@ if __name__ == '__main__':
     #        format='jpeg',
     #        dpi=100,
     #        bbox_inches='tight')
-
-           
