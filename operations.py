@@ -20,3 +20,15 @@ def eightBitAdd(input):
 
 def eightBitMultiply(input):
     return product(input) % 256
+
+
+operations_dispatcher = {   "NAND" : NAND,
+                            "AND" : AND,
+                            "OR" : OR,
+                            "NOR" : NOR,
+                            "eightBitAdd" : eightBitAdd,
+                            "eightBitMultiply" : eightBitMultiply,
+                            "sum" : sum,
+                            "product" : product,
+                            "min" : min,
+                            "max" : max}

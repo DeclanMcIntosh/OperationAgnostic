@@ -5,12 +5,27 @@ import names
 from agent import * 
 import numpy as np
 import matplotlib.pyplot as plt
+import json
 
 from operations import *
 from utils import *
 from config import *
 
-if __name__ == '__main__':    
+def train(configString):
+    with open(configString) as f:
+        data  = f.read()
+    config = json.loads(data)
+    config['action_handler'] = dispatcher[config['action_handler']]
+    operations = []
+    for operation in config['operations']:
+        operations.append(operations_dispatcher[operation])
+    config['operations'] = operations
+
+    inno = Innovation(config['inputs']+config['outputs'])
+    agentParams=dict(inputs=config['inputs'], outputs=config['outputs'], max_layers=config['max_layers'], default_output=config['default_output'], operations=config['operations'], 
+                add_node_rate=config['add_node_rate'], add_connection_rate=config['add_connection_rate'], remove_node_rate=config['remove_node_rate'], remove_connection_rate=config['remove_connection_rate'])
+
+    env = gym.make(config['envName'])
     env.reset()
 
     # intiallize agents and mutate all agents 
@@ -18,7 +33,7 @@ if __name__ == '__main__':
     species = []
     fitnesses = []
     startingSpeciesName = names.get_full_name(gender='female')
-    for x in range(population):
+    for x in range(config['population']):
         agents.append(AgentFFO(**agentParams))
         species.append(startingSpeciesName)
         fitnesses.append(0)
@@ -28,17 +43,17 @@ if __name__ == '__main__':
     fitnessHistory = []
     speciesNumberHistory = []
 
-    for ___ in range(generations):
+    for ___ in range(config['generations']):
         # play all agents in environment
-        for x in range(population):
+        for x in range(config['population']):
             obs = env.reset()
             _ = 0
             terminal = False
             fitness = 0
-            for n in range(numberOfTrialsToRun):
-                while _ < maxStepsPerRun and not terminal:
+            for n in range(config['numberOfTrialsToRun']):
+                while _ < config['maxStepsPerRun'] and not terminal:
                     _ +=1   
-                    action = action_handler(obs, agents[x])
+                    action = config['action_handler'](obs, agents[x])
                     obs, rew, terminal, info = env.step(action)
                     #env.render()
                     fitness += rew
@@ -46,7 +61,7 @@ if __name__ == '__main__':
                 _ =0
                 obs = env.reset()
             #print(fitness)
-            fitnesses[x] = fitness/numberOfTrialsToRun
+            fitnesses[x] = fitness/config['numberOfTrialsToRun']
             #print(x)
 
         print('Done Evaluating All Agents for generation: ' + str(___))
@@ -59,7 +74,7 @@ if __name__ == '__main__':
         fitnesses, agents, species = zip(*zipped)
         fitnesses, agents, species = list(fitnesses), list(agents), list(species)
         representatives = {}
-        for x in range(population):
+        for x in range(config['population']):
             match = None
             genome = agents[x].getGenome()
             for representative in representatives.keys():
@@ -132,3 +147,8 @@ if __name__ == '__main__':
     plt.show()
 
     agents[0].VisualizeModel()
+
+
+if __name__ == '__main__':
+    configString = 'configs/config_cart_pole_uint8_add.json' 
+    train(configString)
