@@ -14,6 +14,10 @@ def train(configString):
     with open(configString) as f:
         data  = f.read()
     config = json.loads(data)
+
+    # seed random
+    r.seed(config['seed'])
+
     config['action_handler'] = dispatcher[config['action_handler']]
     operations = []
     for operation in config['operations']:
@@ -149,5 +153,5 @@ def train(configString):
 
 
 if __name__ == '__main__':
-    configString = 'configs/config_cart_pole_uint8_add.json' 
+    configString = 'configs/config_cart_pole_binary_nand.json' 
     train(configString)

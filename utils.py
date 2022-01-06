@@ -27,6 +27,21 @@ def CartPole_Action(obs, agent):
     else: action = 0
     return action
 
+def CartPole_Action_Binary(obs, agent):
+    fullObs = []
+    uintObs = convertCartPoleActionState(obs)
+    for value in uintObs:
+        temp = value
+        for x in list(range(8)):
+            if temp >= 2**(7-x):
+                fullObs.append(1)
+                temp = temp - 2**(7-x)
+            else:
+                fullObs.append(0)
+
+    return agent.forward(fullObs)[0]
+
 #### dispatcher for config files to be able to find functions
-dispatcher = {"CartPole_Action": CartPole_Action,
+dispatcher = {  "CartPole_Action": CartPole_Action,
+                "CartPole_Action_Binary": CartPole_Action_Binary,
                 "convertSwingUpActionState": convertSwingUpActionState}

@@ -16,4 +16,5 @@
 "numberOfTrialsToRun" : 5,
 "topXtoSave" : 1,
 "envName":"CartPole-v0",
-"action_handler" : "CartPole_Action"}
+"action_handler" : "CartPole_Action",
+"seed": 112358}
