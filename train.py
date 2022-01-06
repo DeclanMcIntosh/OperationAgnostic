@@ -131,6 +131,7 @@ def train(configString):
             for index in speciesIndexs[config['topXtoSave']:]:
                 agents[index].mutate(inno)
 
+        print(meanFtiness)
         fitnessHistory.append(meanFtiness)
         speciesNumberHistory.append(len(representatives.keys()))
 
@@ -156,6 +157,6 @@ def train(configString):
 
 
 if __name__ == '__main__':
-    #configString = 'configs/config_cart_pole_binary_nand.json' 
-    configString = 'configs/config_cart_pole_uint8_add.json' 
+    configString = 'configs/config_cart_pole_binary_nand.json' 
+    #configString = 'configs/config_cart_pole_uint8_add.json' 
     train(configString)

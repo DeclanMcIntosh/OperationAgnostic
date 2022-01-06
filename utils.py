@@ -29,7 +29,7 @@ def CartPole_Action(obs, agent):
 
 def CartPole_Action_Binary(obs, agent):
     fullObs = []
-    uintObs = convertCartPoleActionState(obs)[0:3]
+    uintObs = convertCartPoleActionState(obs)#[0:3]
     for value in uintObs:
         temp = value
         for x in list(range(8)):
