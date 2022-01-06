@@ -204,7 +204,7 @@ class AgentFFO():
         plt.show()
 
     def getGenome(self):
-        nodeInnovations = list(self.model.keys())
+        nodeInnovations = list(self.model.keys())[self.inputs+self.outputs-1:]
         connectionInnovations = []
         for nodeInno in nodeInnovations:
             connectionInnovations += list(self.model[nodeInno].inputs.keys())

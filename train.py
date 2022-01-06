@@ -134,6 +134,26 @@ def train(configString):
         fitnessHistory.append(meanFtiness)
         speciesNumberHistory.append(len(representatives.keys()))
 
+        # Test to see if model has won
+        obs = env.reset()
+        _ = 0
+        terminal = False
+        fitness = 0
+        for x in range(100):
+            while _ < config['maxStepsPerRun'] and not terminal:
+                _ +=1   
+                action = config['action_handler'](obs, agents[0])
+                obs, rew, terminal, info = env.step(action)
+                fitness += rew
+            terminal = False
+            _ =0
+            obs = env.reset()
+
+        print(fitness/100)
+        if fitness/100 > 195: break
+
+        agents[0].VisualizeModel()
+
     # create figure and axis objects with subplots()
     fig,ax = plt.subplots()
     # make a plot
@@ -149,9 +169,24 @@ def train(configString):
     ax2.set_ylabel("# of Species",color="blue",fontsize=14)
     plt.show()
 
-    agents[0].VisualizeModel()
+    obs = env.reset()
+    _ = 0
+    terminal = False
+    fitness = 0
+    while True:
+        while _ < config['maxStepsPerRun'] and not terminal:
+            _ +=1   
+            action = config['action_handler'](obs, agents[0])
+            obs, rew, terminal, info = env.step(action)
+            env.render()
+            fitness += rew
+        terminal = False
+        _ = 0
+        obs = env.reset()
+
 
 
 if __name__ == '__main__':
     configString = 'configs/config_cart_pole_binary_nand.json' 
+    #configString = 'configs/config_cart_pole_uint8_add.json' 
     train(configString)

@@ -9,7 +9,7 @@
 "remove_connection_rate":0.1,
 "population" : 128,
 "generations" : 64,
-"maxStepsPerRun" : 100,
+"maxStepsPerRun" : 200,
 "compatabilityThreashold" : 0.5,
 "saveBestModelEachSpecies" : true,
 "populationOverwriteRate" : 0.125,
