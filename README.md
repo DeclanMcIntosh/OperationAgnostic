@@ -16,3 +16,8 @@
 - *strech* testing with different possible depths, can you make wide shallow methods with really low latency for control
 - ~make configs in jsons referanceable~
 - Cant stop the nand gate or all binary logic gates one from using the sign of the 4th observation value, the pole rotational velocity as a local minima for how to solve it. Literally just a connection from this node to the output gives a reward averaging to ~180 but needs 195 to solve...
+
+
+# Requires
+
+python >= 3.7 (dictionary insertion order)
