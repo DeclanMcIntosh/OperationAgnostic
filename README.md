@@ -1,4 +1,4 @@
-# OperationAgnostic
+# Operation Agnostic Control By Evolving Topologies: Solving Cart-Pole in X Additions
 
 # TODO list
 
