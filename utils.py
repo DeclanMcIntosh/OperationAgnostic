@@ -38,8 +38,11 @@ def CartPole_Action_Binary(obs, agent):
                 temp = temp - 2**(7-x)
             else:
                 fullObs.append(0)
-
-    return agent.forward(fullObs)[0]
+    # Hacky to force binary methods out of loca minima
+    if agent.forward(fullObs)[0] != agent.forward(fullObs)[1]:
+        return 1 
+    else: 
+        return 0
 
 #### dispatcher for config files to be able to find functions
 dispatcher = {  "CartPole_Action": CartPole_Action,
