@@ -15,8 +15,9 @@ def train(configString):
         data  = f.read()
     config = json.loads(data)
 
-    # seed random
+    # seed random, we only use the random but the gym environments also use the numpy random
     r.seed(config['seed'])
+    np.random.seed(config['seed'])
 
     config['action_handler'] = dispatcher[config['action_handler']]
     operations = []
@@ -30,6 +31,7 @@ def train(configString):
 
     env = gym.make(config['envName'])
     env.reset()
+    env.seed(r.randint(0,999999))
 
     # intiallize agents and mutate all agents 
     agents = []
@@ -50,6 +52,7 @@ def train(configString):
         # play all agents in environment
         for x in range(config['population']):
             obs = env.reset()
+            env.seed(r.randint(0,999999))
             _ = 0
             terminal = False
             fitness = 0
@@ -63,6 +66,7 @@ def train(configString):
                 terminal = False
                 _ =0
                 obs = env.reset()
+                env.seed(r.randint(0,999999))
             #print(fitness)
             fitnesses[x] = fitness/config['numberOfTrialsToRun']
             #print(x)
@@ -157,6 +161,6 @@ def train(configString):
 
 
 if __name__ == '__main__':
-    configString = 'configs/config_cart_pole_binary_nand.json' 
-    #configString = 'configs/config_cart_pole_uint8_add.json' 
+    #configString = 'configs/config_cart_pole_binary_nand.json' 
+    configString = 'configs/config_cart_pole_uint8_add.json' 
     train(configString)
