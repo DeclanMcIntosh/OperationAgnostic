@@ -3,8 +3,13 @@ from cv2 import add, resize
 import networkx as nx
 import matplotlib.pyplot as plt 
 import time
+import json
+
+from operations import *
+from utils import *
 
 from numpy.core.fromnumeric import product
+from numpy.lib.npyio import save
 
 class Innovation():
     def __init__(self, initial) -> None:
@@ -74,6 +79,8 @@ class Node():
         return self.output
 
     def getLayer(self):
+        assert type(self.layer) == int
+
         return self.layer
 
 class AgentFFO():
@@ -188,6 +195,7 @@ class AgentFFO():
         nodes = list(self.model.keys())
         
         for node in nodes:
+            self.model[node].removeLostConnections(self.model)
             G.add_node(node, layer=self.model[node].getLayer())
 
         for node in nodes:
@@ -210,6 +218,76 @@ class AgentFFO():
             connectionInnovations += list(self.model[nodeInno].inputs.keys())
         return nodeInnovations + connectionInnovations
 
+    def saveModel(self, filename):
+        '''
+        Saves the model as a json.
+        '''
+        saveDict = {}
+        saveDict["inputs"] = self.inputs  
+        saveDict["outputs"] = self.outputs  
+        saveDict["max_layers"] = self.max_layers  
+        saveDict["default_output"] = self.default_output  
+        saveDict["operations"] = []
+        for operation in self.operations:
+            saveDict["operations"].append(str(operation.__name__))
+        saveDict["add_node_rate"] = self.add_node_rate  
+        saveDict["add_connection_rate"] = self.add_connection_rate  
+        saveDict["remove_connection_rate"] = self.remove_connection_rate  
+        saveDict["remove_node_rate"] = self.remove_node_rate   
+        saveDict["inputsInnovation"] = self.inputsInnovation
+        saveDict["outputsInnovation"] = self.outputsInnovation
+
+        saveDict["nodes"] = {}
+
+        for key in self.model.keys():
+            node = {}
+            node["inputs"] = self.model[key].inputs
+            node["layer"] = self.model[key].layer
+            node["innovation_number"] = self.model[key].innovation_number
+            node["default_output"] = self.model[key].default_output
+            node["output"] = self.model[key].output
+            node["updated"] = self.model[key].updated
+            node["operation"] = str(self.model[key].operation.__name__)  
+            saveDict["nodes"][key] = node
+
+        with open(filename, 'w') as fp:
+            json.dump(saveDict, fp)
+
+    def loadModel(self, filename):
+        with open(filename) as f:
+            data  = f.read()
+        modelInfo = json.loads(data)
+
+        self.model = {}
+
+        self.inputs = modelInfo["inputs"]   
+        self.outputs = modelInfo["outputs"]   
+        self.max_layers = modelInfo["max_layers"]   
+        self.default_output = modelInfo["default_output"]   
+        self.operations = []
+        for operation in modelInfo["operations"]:
+            self.operations.append(operations_dispatcher[operation]) 
+        self.add_node_rate = modelInfo["add_node_rate"]   
+        self.add_connection_rate = modelInfo["add_connection_rate"]   
+        self.remove_connection_rate = modelInfo["remove_connection_rate"]   
+        self.remove_node_rate = modelInfo["remove_node_rate"]    
+        self.inputsInnovation = modelInfo["inputsInnovation"] 
+        self.outputsInnovation = modelInfo["outputsInnovation"] 
+
+        for key in modelInfo["nodes"]:
+            nodeStructure = Node(0,0,self.default_output, r.choice(self.operations))
+            for connKey in  modelInfo["nodes"][key]["inputs"]:
+                nodeStructure.inputs[int(connKey)] = modelInfo["nodes"][key]["inputs"][connKey]
+            nodeStructure.layer = modelInfo["nodes"][key]["layer"]
+            nodeStructure.innovation_number = modelInfo["nodes"][key]["innovation_number"]
+            nodeStructure.default_output = modelInfo["nodes"][key]["default_output"]
+            nodeStructure.output = modelInfo["nodes"][key]["output"]
+            nodeStructure.updated = modelInfo["nodes"][key]["updated"]
+            nodeStructure.operation = operations_dispatcher[modelInfo["nodes"][key]["operation"]]
+            self.model[int(key)] = nodeStructure
+
+
+
 if __name__ == '__main__':
     
     model = AgentFFO(8, 4, 4, 0, [sum], 0.25, 0.5, 0.1, 0.1)
@@ -221,6 +299,12 @@ if __name__ == '__main__':
         model.mutate(inno)
         model1.mutate(inno)
 
+    model.VisualizeModel()
+    model.saveModel("exampleTestModel.test")
+    
+    model.loadModel("exampleTestModel.test")
+
+    model.saveModel("reSaveExampleTestModel.test")
     model.VisualizeModel()
 
     model1.VisualizeModel()
