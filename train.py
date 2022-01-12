@@ -1,6 +1,5 @@
 import gym
 from gym.envs.registration import spec
-import gym_cartpole_swingup
 import names
 from agent import * 
 import numpy as np
