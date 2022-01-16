@@ -1,13 +1,15 @@
-import gym
-from gym.envs.registration import spec
-import names
-from agent import * 
-import numpy as np
-import matplotlib.pyplot as plt
 import json
 
+import gym
+import matplotlib.pyplot as plt
+import names
+import numpy as np
+from gym.envs.registration import spec
+
+from agent import *
 from operations import *
 from utils import *
+
 
 def train(configString):
     with open(configString) as f:
