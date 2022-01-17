@@ -97,7 +97,7 @@ def train(configString):
                     species[x] = names.get_full_name(gender='female')
                 representatives[species[x]] = genome
 
-        print('The number of species is :' + str(len(representatives.keys())))
+        print('The number of species is:' + str(len(representatives.keys())))
 
         speciesFitnesses = representatives.copy()
         for key in speciesFitnesses.keys(): speciesFitnesses[key] = 0
