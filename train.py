@@ -1,4 +1,6 @@
+from datetime import datetime, timedelta
 import json
+import time
 
 import gym
 import matplotlib.pyplot as plt
@@ -15,6 +17,7 @@ def train(configString):
     with open(configString) as f:
         data  = f.read()
     config = json.loads(data)
+    print_config(config)
 
     # seed random, we only use the random but the gym environments also use the numpy random
     r.seed(config['seed'])
@@ -49,7 +52,12 @@ def train(configString):
     fitnessHistory = []
     speciesNumberHistory = []
 
+    print(f'Starting training at {datetime.now()}...\n')
+    print('Generation \t# species \tMean fitness \tElapsed time')
+    print('--------------------------------------------------------------------------------')
+
     for ___ in range(config['generations']):
+        time_generation = time.time()
         # play all agents in environment
         for x in range(config['population']):
             obs = env.reset()
@@ -72,7 +80,8 @@ def train(configString):
             fitnesses[x] = fitness/config['numberOfTrialsToRun']
             #print(x)
 
-        print('Done Evaluating All Agents for generation: ' + str(___))
+        print(___, end='\t\t') # Done evaluating all agents for generation
+
         # speciate agents by sortting by fitness then deciding on species then 
         
         zipped = zip(fitnesses, agents, species)
@@ -97,16 +106,16 @@ def train(configString):
                     species[x] = names.get_full_name(gender='female')
                 representatives[species[x]] = genome
 
-        print('The number of species is:' + str(len(representatives.keys())))
+        print(len(representatives.keys()), end='\t\t') # number of species
 
         speciesFitnesses = representatives.copy()
         for key in speciesFitnesses.keys(): speciesFitnesses[key] = 0
         for x in range(config['population']): speciesFitnesses[species[x]] += fitnesses[x]
         for key in speciesFitnesses.keys(): speciesFitnesses[key] = speciesFitnesses[key]/ species.count(key) 
 
-        meanFtiness = np.mean(np.array((list(speciesFitnesses.values()))))
+        meanFitness = np.mean(np.array((list(speciesFitnesses.values()))))
         adjustedSpeciesFitnesses = speciesFitnesses.copy()
-        for key in adjustedSpeciesFitnesses.keys(): adjustedSpeciesFitnesses[key] = adjustedSpeciesFitnesses[key] - meanFtiness
+        for key in adjustedSpeciesFitnesses.keys(): adjustedSpeciesFitnesses[key] = adjustedSpeciesFitnesses[key] - meanFitness
         totalFitnesses = np.sum(np.array((list(speciesFitnesses.values()))))
         for key in adjustedSpeciesFitnesses.keys(): adjustedSpeciesFitnesses[key] = adjustedSpeciesFitnesses[key] / totalFitnesses
 
@@ -132,12 +141,13 @@ def train(configString):
         # Mutate all the non best agents 
         speciesRefs = list(adjustedSpeciesFitnesses.keys())
         for x in range(len(speciesRefs)):
-            speciesIndexs = [i for i, k in enumerate(species) if k == speciesRefs[x]]
-            for index in speciesIndexs[config['topXtoSave']:]:
+            speciesIndexes = [i for i, k in enumerate(species) if k == speciesRefs[x]]
+            for index in speciesIndexes[config['topXtoSave']:]:
                 agents[index].mutate(inno)
 
-        print(meanFtiness)
-        fitnessHistory.append(meanFtiness)
+        print(f'{meanFitness:.2f}', end='\t\t') # average fitness
+        print(str(timedelta(seconds=time.time() - time_generation))) # elapsed time
+        fitnessHistory.append(meanFitness)
         speciesNumberHistory.append(len(representatives.keys()))
 
     # visualize best model
@@ -159,9 +169,24 @@ def train(configString):
     plt.show()
 
 
-
+def print_config(config):
+    print('***********************************************************')
+    print(f'inputs: {config["inputs"]}')
+    print(f'outputs: {config["outputs"]}')
+    print(f'max_layers: {config["max_layers"]}')
+    print(f'populations: {config["population"]}')
+    print(f'generations: {config["generations"]}')
+    print('***********************************************************')
+    print()
+    print()
 
 if __name__ == '__main__':
+    training_start = time.time()
+
     #configString = 'configs/config_cart_pole_binary_nand.json' 
     configString = 'configs/config_cart_pole_uint8_add.json' 
     train(configString)
+
+    training_end = time.time()
+    training_time = training_end - training_start
+    print("Total train time: {}".format(str(timedelta(seconds=training_time))))
