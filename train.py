@@ -183,8 +183,9 @@ def print_config(config):
 if __name__ == '__main__':
     training_start = time.time()
 
-    #configString = 'configs/config_cart_pole_binary_nand.json' 
-    configString = 'configs/config_cart_pole_uint8_add.json' 
+    # configString = 'configs/config_cart_pole_binary_nand.json'
+    # configString = 'configs/config_cart_pole_uint8_add.json'
+    configString = 'configs/config_lunar_lander_uint8_add.json'
     train(configString)
 
     training_end = time.time()

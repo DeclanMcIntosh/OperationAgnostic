@@ -1,0 +1,23 @@
+{
+    "inputs": 8,
+    "outputs": 4,
+    "max_layers": 4,
+    "default_output": 0,
+    "operations": ["eightBitAdd"],
+    "add_node_rate": 0.25,
+    "add_connection_rate": 0.5,
+    "remove_node_rate": 0.1,
+    "remove_connection_rate": 0.1,
+    "population": 256,
+    "generations": 256,
+    "maxStepsPerRun": 200,
+    "compatabilityThreashold": 0.5,
+    "saveBestModelEachSpecies": true,
+    "populationOverwriteRate": 0.1,
+    "numberOfTrialsToRun": 5,
+    "topXtoSave": 2,
+    "envName": "LunarLander-v2",
+    "action_handler": "LunarLander_Action",
+    "seed": 112358
+  }
+  

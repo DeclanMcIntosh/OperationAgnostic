@@ -44,7 +44,22 @@ def CartPole_Action_Binary(obs, agent):
     else: 
         return 0
 
+#### LunarLander-v2
+def convertLunarLanderActionState(obs):
+    return list(map(f2int, obs))
+
+def LunarLander_Action(obs, agent):
+    uintObs = convertLunarLanderActionState(obs)
+
+    modelActions = agent.forward(uintObs)
+
+    maxValue = max(modelActions)
+
+    return modelActions.index(maxValue)
+
+
 #### dispatcher for config files to be able to find functions
 dispatcher = {  "CartPole_Action": CartPole_Action,
                 "CartPole_Action_Binary": CartPole_Action_Binary,
+                "LunarLander_Action": LunarLander_Action,
                 "convertSwingUpActionState": convertSwingUpActionState}
