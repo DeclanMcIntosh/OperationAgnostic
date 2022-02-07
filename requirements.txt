@@ -1,0 +1,6 @@
+gym
+matplotlib
+names
+networkx
+numpy
+opencv-python-headless

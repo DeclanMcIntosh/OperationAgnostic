@@ -1,15 +1,16 @@
-import random as r
-from cv2 import add, resize
-import networkx as nx
-import matplotlib.pyplot as plt 
-import time
 import json
+import random as r
+import time
+
+import matplotlib.pyplot as plt
+import networkx as nx
+from cv2 import add, resize
+from numpy.core.fromnumeric import product
+from numpy.lib.npyio import save
 
 from operations import *
 from utils import *
 
-from numpy.core.fromnumeric import product
-from numpy.lib.npyio import save
 
 class Innovation():
     def __init__(self, initial) -> None:
