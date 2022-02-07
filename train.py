@@ -53,7 +53,7 @@ def train(configString):
     speciesNumberHistory = []
 
     print(f'Starting training at {datetime.now()}...\n')
-    print('Generation \t# species \tMean fitness \tElapsed time')
+    print('Generation \t# species \tMean fitness \tMax fitness \tElapsed time')
     print('--------------------------------------------------------------------------------')
 
     for ___ in range(config['generations']):
@@ -114,6 +114,7 @@ def train(configString):
         for key in speciesFitnesses.keys(): speciesFitnesses[key] = speciesFitnesses[key]/ species.count(key) 
 
         meanFitness = np.mean(np.array((list(speciesFitnesses.values()))))
+        maxFitness  = np.max(np.array((list(speciesFitnesses.values()))))
         adjustedSpeciesFitnesses = speciesFitnesses.copy()
         for key in adjustedSpeciesFitnesses.keys(): adjustedSpeciesFitnesses[key] = adjustedSpeciesFitnesses[key] - meanFitness
         totalFitnesses = np.sum(np.array((list(speciesFitnesses.values()))))
@@ -154,12 +155,13 @@ def train(configString):
         fitnesses, agents, species = zip(*zipped)
         fitnesses, agents, species = list(fitnesses), list(agents), list(species)
         
-        fitnessHistory.append(meanFtiness)
+        fitnessHistory.append(meanFitness)
         speciesIndexes = [i for i, k in enumerate(species) if k == speciesRefs[x]]
         for index in speciesIndexes[config['topXtoSave']:]:
             agents[index].mutate(inno)
 
         print(f'{meanFitness:.2f}', end='\t\t') # average fitness
+        print(f'{maxFitness:.2f}', end='\t\t')
         print(str(timedelta(seconds=time.time() - time_generation))) # elapsed time
         fitnessHistory.append(meanFitness)
         speciesNumberHistory.append(len(representatives.keys()))
@@ -197,9 +199,9 @@ def print_config(config):
 if __name__ == '__main__':
     training_start = time.time()
 
-    # configString = 'configs/config_cart_pole_binary_nand.json'
-    # configString = 'configs/config_cart_pole_uint8_add.json'
-    configString = 'configs/config_lunar_lander_uint8_add.json'
+    configString = 'configs/config_cart_pole_binary_nand.json'
+    #configString = 'configs/config_cart_pole_uint8_add.json'
+    #configString = 'configs/config_lunar_lander_uint8_add.json'
     train(configString)
 
     training_end = time.time()
