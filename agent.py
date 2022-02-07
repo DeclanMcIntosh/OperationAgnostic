@@ -127,24 +127,33 @@ class AgentFFO():
 
         return outputs
 
-    def mutateOLD(self, inno):
+    def mutateOld(self, inno):
         allowInputOutputConnections = False
-        # Add connections
-        addedConnection = False or r.random() > self.add_connection_rate
-        nodes = list(self.model.keys())
-        while not addedConnection:
-            output = r.choice(nodes)
-            inputNode = r.choice(nodes)
-            if self.model[output].layer > self.model[inputNode].layer:
-                if allowInputOutputConnections or self.model[output].layer != self.max_layers or self.model[inputNode].layer != -1:
-                    self.model[output].addInputs(inputNode, inno.getValue())
-                addedConnection = True
 
         # Add node
         addNode = r.random() < self.add_node_rate
         if addNode:
             layer = r.randint(0,self.max_layers-1)
-            self.model[inno.getValue()] = Node(layer,inno.getValue(),self.default_output, r.choice(self.operations))
+            InnovationNumber = inno.getValue()
+            self.model[InnovationNumber] = Node(layer,InnovationNumber,self.default_output, r.choice(self.operations))
+            
+        # Add connections
+        addedConnection = False or r.random() > self.add_connection_rate
+        nodes = list(self.model.keys())
+        target_layer = r.randint(1,self.max_layers)
+        attempts = 0
+        while not addedConnection:
+            attempts += 1
+            output = r.choice(nodes)
+            if self.model[output].layer == target_layer:
+                inputNode = r.choice(nodes)
+                if self.model[output].layer > self.model[inputNode].layer:
+                    if allowInputOutputConnections or self.model[output].layer != self.max_layers or self.model[inputNode].layer != -1:
+                        self.model[output].addInputs(inputNode, inno.getValue())
+                    addedConnection = True
+            if attempts > 100:
+                addedConnection = True
+
 
         # Remove node
         if r.random() < self.remove_connection_rate and len(list(self.model.keys())) > self.inputs + self.outputs:
@@ -164,7 +173,6 @@ class AgentFFO():
             while (nodeToRemove <= self.inputs or len(list(self.model[nodeToRemove].inputs.keys())) == 0) and x < 25:
                 nodeToRemove = r.choice(list(self.model.keys()))
                 x+= 1
-
             if x < 25:
                 connectiontoRemove = r.choice(list(self.model[nodeToRemove].inputs.keys()))
                 del self.model[nodeToRemove].inputs[connectiontoRemove]
@@ -174,6 +182,7 @@ class AgentFFO():
             self.model[node].removeLostConnections(self.model)
 
     def mutate(self, inno):
+        allowInputOutputConnections = True
 
         # Figure out how many nodes in each layer
         counts = {-1:0,self.max_layers:0}
@@ -182,22 +191,28 @@ class AgentFFO():
             counts[self.model[index].layer] += 1
 
         # Add node 
+        nodes = list(self.model.keys())
         addNode = r.random() < self.add_node_rate
         if addNode:
             layer = r.randint(0,self.max_layers-1)
-            self.model[inno.getValue()] = Node(layer,inno.getValue(),self.default_output, r.choice(self.operations))
+            InnovationNumber = inno.getValue()
+            self.model[InnovationNumber] = Node(layer,InnovationNumber,self.default_output, r.choice(self.operations))
+            # always add an output connection to a new node
+            addedConnection = False
+            while not addedConnection:
+                output = r.choice(nodes)
+                inputNode = InnovationNumber
+                if self.model[output].layer > self.model[inputNode].layer:
+                    if self.model[output].layer != self.max_layers or self.model[inputNode].layer != -1:
+                        self.model[output].addInputs(inputNode, inno.getValue())
+                        addedConnection = True
 
-        #for targetLayer in range(self.max_layers):
-        #    addNode = r.random() < self.add_node_rate/(counts[targetLayer]+1)
-        #    if addNode:
-        #        self.model[inno.getValue()] = Node(targetLayer,inno.getValue(),self.default_output, r.choice(self.operations))
 
         # Add connections
         nodes = list(self.model.keys())
         r.shuffle(nodes)
         maxAddedConnections = 1
         addedConnections = 0
-        allowInputOutputConnections = True
         if r.random() < self.add_connection_rate:
             for index in nodes:
                 if self.model[index].layer != -1:
@@ -239,6 +254,8 @@ class AgentFFO():
         # get rid of dangeling connections:
         for node in self.model.keys():
             self.model[node].removeLostConnections(self.model)
+
+        # if a node has no outputs it is removed...
 
     def crossoverModels(self, secondModel):
         '''

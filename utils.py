@@ -1,3 +1,4 @@
+from math import floor
 
 ### General
 def f2int(float):
@@ -47,6 +48,21 @@ def CartPole_Action_Binary(obs, agent):
     else: 
         return 0
 
+def CartPole_Action_Binary_Binned(obs, agent):
+    bins = 16 
+    fullObs = []
+    uintObs = convertCartPoleActionState(obs)
+    for value in uintObs:
+        x = floor(value/(bins))
+        for n in range(bins):
+            if x!=n: fullObs.append(0)
+            else: fullObs.append(1)
+    
+    if agent.forward(fullObs)[0] != agent.forward(fullObs)[1]:
+        return 1 
+    else: 
+        return 0
+
 
 #### Bipedal-Walker
 def convertWalkerActionState(obs):
@@ -88,7 +104,7 @@ def Walker_Action_Binary(obs, agent):
         output.append((binatodeci(action[8*x:8*(x+1)])-128)/128)
 
     return output
-    
+
 #### LunarLander-v2
 def convertLunarLanderActionState(obs):
     return list(map(f2int, obs))
@@ -103,6 +119,8 @@ def LunarLander_Action(obs, agent):
     return modelActions.index(maxValue)
 
 
+
+
 #### dispatcher for config files to be able to find functions
 dispatcher = {  "CartPole_Action": CartPole_Action,
                 "CartPole_Action_Binary": CartPole_Action_Binary,
@@ -110,4 +128,5 @@ dispatcher = {  "CartPole_Action": CartPole_Action,
                 "Walker_Action": Walker_Action,
                 "Walker_Action_Binary": Walker_Action_Binary,
                 "LunarLander_Action": LunarLander_Action,
-                "convertSwingUpActionState": convertSwingUpActionState}
+                "convertSwingUpActionState": convertSwingUpActionState,
+                "CartPole_Action_Binary_Binned":CartPole_Action_Binary_Binned}
