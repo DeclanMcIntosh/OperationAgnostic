@@ -9,6 +9,9 @@ def int2f(int):
 def IoU(a, b):
     return len(list(set(a) & set(b)))/len(list(set(a) | set(b)))
     
+def binatodeci(binary):
+    return sum(val*(2**idx) for idx, val in enumerate(reversed(binary)))
+
 #### Swing up
 def convertSwingUpActionState(obs):
     output = []
@@ -63,13 +66,32 @@ def Walker_Action(obs, agent):
     output = []
     for value in action:
         output.append(int2f(value))
-    
+
     return output
 
+def Walker_Action_Binary(obs, agent):
+    uintObs = convertWalkerActionState(obs)
+    fullObs = []
+    for value in uintObs:
+        temp = value
+        for x in list(range(8)):
+            if temp >= 2**(7-x):
+                fullObs.append(1)
+                temp = temp - 2**(7-x)
+            else:
+                fullObs.append(0)
+    action = agent.forward(fullObs)
 
+    output = []
+
+    for x in range(4):
+        output.append((binatodeci(action[8*x:8*(x+1)])-128)/128)
+
+    return output
 
 #### dispatcher for config files to be able to find functions
 dispatcher = {  "CartPole_Action": CartPole_Action,
                 "CartPole_Action_Binary": CartPole_Action_Binary,
                 "convertSwingUpActionState": convertSwingUpActionState,
-                "Walker_Action": Walker_Action}
+                "Walker_Action": Walker_Action,
+                "Walker_Action_Binary": Walker_Action_Binary}

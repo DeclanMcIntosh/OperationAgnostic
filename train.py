@@ -115,7 +115,8 @@ def train(configString):
             speciesToPropegate = r.choices(list(adjustedSpeciesFitnesses.keys()), weights=list(adjustedSpeciesFitnesses.values()))[0]
 
             # Pick worst agent to overwrite and random agent to propegate
-            agentToOverwriteIndex = [i for i, k in enumerate(species) if k == speciesToOverwrite][-1]
+            agentToOverwriteIndex = [i for i, k in enumerate(species) if k == speciesToOverwrite]
+            agentToOverwriteIndex = agentToOverwriteIndex[-1]
             agentToPropegateIndex = r.choice([i for i, k in enumerate(species) if k == speciesToPropegate])
 
             # Make copy to replace bad agent
@@ -133,9 +134,18 @@ def train(configString):
         for x in range(len(speciesRefs)):
             speciesIndexs = [i for i, k in enumerate(species) if k == speciesRefs[x]]
             for index in speciesIndexs[config['topXtoSave']:]:
-                agents[index].mutate(inno)
+                for x in range(r.randint(1,config['MaxMutations'])):
+                    agents[index].mutate(inno)
+
+        zipped = zip(fitnesses, agents, species)
+        
+        zipped = sorted(zipped, key = lambda x: x[0])
+        zipped.reverse()
+        fitnesses, agents, species = zip(*zipped)
+        fitnesses, agents, species = list(fitnesses), list(agents), list(species)
 
         print(meanFtiness)
+        print(fitnesses[0])
         fitnessHistory.append(meanFtiness)
         speciesNumberHistory.append(len(representatives.keys()))
 
@@ -158,9 +168,9 @@ def train(configString):
     plt.show()
 
 
-
-
 if __name__ == '__main__':
     #configString = 'configs/config_cart_pole_binary_nand.json' 
-    configString = 'configs/config_cart_pole_uint8_add.json' 
+    #configString = 'configs/config_cart_pole_uint8_add.json' 
+    configString = 'configs/config_bipedal_walker_uint8_add.json'
+    #configString = 'configs/config_bipedal_walker_nand.json'
     train(configString)

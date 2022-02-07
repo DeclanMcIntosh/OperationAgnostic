@@ -126,7 +126,8 @@ class AgentFFO():
 
         return outputs
 
-    def mutate(self, inno):
+    def mutateOLD(self, inno):
+        allowInputOutputConnections = False
         # Add connections
         addedConnection = False or r.random() > self.add_connection_rate
         nodes = list(self.model.keys())
@@ -134,7 +135,8 @@ class AgentFFO():
             output = r.choice(nodes)
             inputNode = r.choice(nodes)
             if self.model[output].layer > self.model[inputNode].layer:
-                self.model[output].addInputs(inputNode, inno.getValue())
+                if allowInputOutputConnections or self.model[output].layer != self.max_layers or self.model[inputNode].layer != -1:
+                    self.model[output].addInputs(inputNode, inno.getValue())
                 addedConnection = True
 
         # Add node
@@ -162,6 +164,73 @@ class AgentFFO():
                 nodeToRemove = r.choice(list(self.model.keys()))
                 x+= 1
 
+            if x < 25:
+                connectiontoRemove = r.choice(list(self.model[nodeToRemove].inputs.keys()))
+                del self.model[nodeToRemove].inputs[connectiontoRemove]
+    
+        # get rid of dangeling connections:
+        for node in self.model.keys():
+            self.model[node].removeLostConnections(self.model)
+
+    def mutate(self, inno):
+
+        # Figure out how many nodes in each layer
+        counts = {-1:0,self.max_layers:0}
+        for x in range(self.max_layers): counts[x] = 0
+        for index in self.model.keys():
+            counts[self.model[index].layer] += 1
+
+        # Add node 
+        addNode = r.random() < self.add_node_rate
+        if addNode:
+            layer = r.randint(0,self.max_layers-1)
+            self.model[inno.getValue()] = Node(layer,inno.getValue(),self.default_output, r.choice(self.operations))
+
+        #for targetLayer in range(self.max_layers):
+        #    addNode = r.random() < self.add_node_rate/(counts[targetLayer]+1)
+        #    if addNode:
+        #        self.model[inno.getValue()] = Node(targetLayer,inno.getValue(),self.default_output, r.choice(self.operations))
+
+        # Add connections
+        nodes = list(self.model.keys())
+        r.shuffle(nodes)
+        maxAddedConnections = 1
+        addedConnections = 0
+        allowInputOutputConnections = True
+        if r.random() < self.add_connection_rate:
+            for index in nodes:
+                if self.model[index].layer != -1:
+                    existingConnectionCount = len(list(self.model[index].inputs.keys())) + 1
+                    addedConnection = False or r.random() > self.add_connection_rate/(existingConnectionCount**2)
+                    while not addedConnection:
+                        output = index
+                        inputNode = r.choice(nodes)
+                        if self.model[output].layer > self.model[inputNode].layer:
+                            if allowInputOutputConnections or self.model[output].layer != self.max_layers or self.model[inputNode].layer != -1:
+                                self.model[output].addInputs(inputNode, inno.getValue())
+                            addedConnection = True
+                            addedConnections += 1
+                if addedConnections >= maxAddedConnections:
+                    break
+
+        # Remove node
+        if r.random() < self.remove_connection_rate and len(list(self.model.keys())) > self.inputs + self.outputs:
+            nodeToRemove = r.choice(list(self.model.keys()))
+            while nodeToRemove <= self.inputs + self.outputs:
+                nodeToRemove = r.choice(list(self.model.keys()))
+            del self.model[nodeToRemove]
+
+            for node in self.model.keys():
+                if nodeToRemove in self.model[node].inputs.values():
+                    del self.model[node].inputs[list(self.model[node].inputs.keys())[list(self.model[node].inputs.values()).index(nodeToRemove)]]
+
+        # Remove Connection
+        if r.random() < self.remove_node_rate:
+            nodeToRemove = r.choice(list(self.model.keys()))
+            x = 0
+            while (nodeToRemove <= self.inputs or len(list(self.model[nodeToRemove].inputs.keys())) == 0) and x < 25:
+                nodeToRemove = r.choice(list(self.model.keys()))
+                x+= 1
             if x < 25:
                 connectiontoRemove = r.choice(list(self.model[nodeToRemove].inputs.keys()))
                 del self.model[nodeToRemove].inputs[connectiontoRemove]
@@ -290,8 +359,8 @@ class AgentFFO():
 
 if __name__ == '__main__':
     
-    model = AgentFFO(8, 4, 4, 0, [sum], 0.25, 0.5, 0.1, 0.1)
-    model1 = AgentFFO(8, 4, 4, 0, [sum], 0.25, 0.5, 0.1, 0.1)
+    model = AgentFFO(8, 4, 4, 0, [sum], 0.5, 0.5, 0.5, 0.5)
+    model1 = AgentFFO(8, 4, 4, 0, [sum], 0.5, 0.5, 0.5, 0.5)
 
     inno = Innovation(8+4)
     
