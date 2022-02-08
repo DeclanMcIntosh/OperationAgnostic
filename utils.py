@@ -1,4 +1,5 @@
 from math import floor
+import numpy as np
 
 ### General
 def f2int(float):
@@ -105,6 +106,27 @@ def Walker_Action_Binary(obs, agent):
 
     return output
 
+def Walker_Action_Binary_Binned(obs, agent):
+    bins = 16 
+    fullObs = []
+    uintObs = convertWalkerActionState(obs)
+    for value in uintObs:
+        x = floor(value/(bins))
+        for n in range(bins):
+            if x!=n: fullObs.append(0)
+            else: fullObs.append(1)
+
+    action = agent.forward(fullObs)
+
+    output = []
+
+    for x in range(4):
+        data = action[16*x:16*(x+1)]
+        value = np.array(data)
+        output.append((np.max(np.argwhere(value == np.amax(value)))/7.5)-1)
+
+    return output
+        
 #### LunarLander-v2
 def convertLunarLanderActionState(obs):
     return list(map(f2int, obs))
@@ -129,4 +151,5 @@ dispatcher = {  "CartPole_Action": CartPole_Action,
                 "Walker_Action_Binary": Walker_Action_Binary,
                 "LunarLander_Action": LunarLander_Action,
                 "convertSwingUpActionState": convertSwingUpActionState,
-                "CartPole_Action_Binary_Binned":CartPole_Action_Binary_Binned}
+                "CartPole_Action_Binary_Binned":CartPole_Action_Binary_Binned,
+                "Walker_Action_Binary_Binned":Walker_Action_Binary_Binned}

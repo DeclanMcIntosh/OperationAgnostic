@@ -113,7 +113,8 @@ class AgentFFO():
             self.model[x] = Node(self.max_layers,x,self.default_output, r.choice(self.operations))
 
     def forward(self, input):
-        assert len(input) == self.inputs
+        assert len(input) == self.inputs, 'Config \'inputs\' should be ' + str(len(input))
+    
 
         outputs = []
 
@@ -254,8 +255,6 @@ class AgentFFO():
         # get rid of dangeling connections:
         for node in self.model.keys():
             self.model[node].removeLostConnections(self.model)
-
-        # if a node has no outputs it is removed...
 
     def crossoverModels(self, secondModel):
         '''
