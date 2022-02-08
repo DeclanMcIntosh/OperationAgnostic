@@ -376,8 +376,8 @@ class AgentFFO():
 
 if __name__ == '__main__':
     
-    model = AgentFFO(8, 4, 4, 0, [sum], 0.5, 0.5, 0.5, 0.5)
-    model1 = AgentFFO(8, 4, 4, 0, [sum], 0.5, 0.5, 0.5, 0.5)
+    model = AgentFFO(8, 4, 4, 0, [sum], 0.5, 0.5, 0.15, 0.15)
+    model1 = AgentFFO(8, 4, 4, 0, [sum], 0.5, 0.5, 0.15, 0.15)
 
     inno = Innovation(8+4)
     
