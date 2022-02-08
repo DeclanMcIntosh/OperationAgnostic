@@ -153,11 +153,14 @@ def train(configString):
         zipped = sorted(zipped, key = lambda x: x[0])
         zipped.reverse()
         fitnesses, agents, species = zip(*zipped)
-        fitnesses, agents, species = list(fitnesses), list(agents), list(species)
-        
-        speciesIndexes = [i for i, k in enumerate(species) if k == speciesRefs[x]]
-        for index in speciesIndexes[config['topXtoSave']:]:
-            agents[index].mutate(inno)
+        fitnesses, agents, species = list(fitnesses), list(agents), lis            speciesIndexes = [i for i, k in enumerate(species) if k == speciesRefs[x]]
+            for index in speciesIndexes[config['topXtoSave']:]:
+                agents[index].mutate(inno)t(species)
+
+        for x in range(len(speciesRefs)):
+            speciesIndexes = [i for i, k in enumerate(species) if k == speciesRefs[x]]
+            for index in speciesIndexes[config['topXtoSave']:]:
+                agents[index].mutate(inno)
 
         print(f'{meanFitness:.2f}', end='\t\t') # average fitness
         print(f'{maxFitness:.2f}', end='\t\t')
@@ -199,7 +202,8 @@ if __name__ == '__main__':
     training_start = time.time()
 
     #configString = 'configs/config_cart_pole_binary_nand.json'
-    configString = 'configs/config_cart_pole_binary_nand_binned.json'
+    #configString = 'configs/config_cart_pole_binary_nand_binned.json'
+    configString = 'configs/config_bipedal_walker_nand_binned.json'
     #configString = 'configs/config_cart_pole_uint8_add.json'
     #configString = 'configs/config_lunar_lander_uint8_add.json'
     train(configString)
